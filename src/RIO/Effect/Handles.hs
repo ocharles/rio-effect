@@ -4,28 +4,29 @@
 {-# language FlexibleInstances #-}
 {-# language KindSignatures #-}
 {-# language MultiParamTypeClasses #-}
+{-# language PolyKinds #-}
 {-# language ScopedTypeVariables #-}
 {-# language TypeApplications #-}
 {-# language TypeFamilies #-}
 {-# language TypeOperators #-}
 {-# language UndecidableInstances #-}
 
-module Effect.Handles ( Handles(..) ) where
+module RIO.Effect.Handles ( Handles(..) ) where
 
 -- base
 import Data.Type.Bool
 import GHC.Exts
 import GHC.Generics
 
--- reader-effects
-import Effect.Handler
+-- rio-effect
+import RIO.Effect.Handler
 
 -- singleton-bool
 import Data.Singletons.Bool
 
 
 class Handles eff a where
-  type Config eff a :: *
+  type Config eff a :: k
 
   type Requires eff a :: ( * -> * ) -> Constraint
 
@@ -52,7 +53,7 @@ instance ( f ~ g ) => Handles f ( g cfg :~> c ) where
   {-# INLINE findHandler #-}
 
 
-type family ProductHasEff ( eff :: * -> * -> * ) ( a :: * ) :: Bool where
+type family ProductHasEff eff a :: Bool where
   ProductHasEff eff ( eff _ :~> _, _ ) = 'True
   ProductHasEff _ _ = 'False
 
@@ -81,7 +82,7 @@ instance ( If ( ProductHasEff eff ( a1, ( a2, a3 ) ) ) ( Handles eff a1 ) ( Hand
     findHandler ( a1, ( a2, a3 ) )
 
 
-type family HasEff ( eff :: * -> * -> * ) ( f :: * -> * ) :: Bool where
+type family HasEff eff ( f :: * -> * ) :: Bool where
   HasEff eff ( K1 _ ( eff _ :~> _ ) ) = 'True
   HasEff eff ( M1 _ _ f ) = HasEff eff f
   HasEff eff ( f :*: g ) = HasEff eff f || HasEff eff g
@@ -91,7 +92,7 @@ type family HasEff ( eff :: * -> * -> * ) ( f :: * -> * ) :: Bool where
 class GFindHandler f eff cfg c where
   type GRequires eff f :: ( * -> * ) -> Constraint
 
-  type GConfig eff f :: *
+  type GConfig eff f :: k
 
   gfindHandler :: f a -> eff cfg :~> c
 
@@ -119,7 +120,7 @@ instance ( If ( HasEff eff f ) ( GFindHandler f eff cfg c ) ( GFindHandler g eff
   {-# INLINE gfindHandler #-}
 
 
-instance ( eff' ~ eff, cfg' ~ cfg, c' ~ c ) => GFindHandler ( K1 i ( eff' ( cfg' :: * ) :~> c' ) ) eff cfg c where
+instance ( eff' ~ eff, cfg' ~ cfg, c' ~ c ) => GFindHandler ( K1 i ( eff' cfg' :~> c' ) ) eff cfg c where
   type GRequires eff ( K1 i ( eff' cfg' :~> c' ) ) = c'
 
   type GConfig eff ( K1 i ( eff' cfg' :~> c' ) ) = cfg'

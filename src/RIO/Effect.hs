@@ -1,4 +1,6 @@
-module Effect
+{-# language TypeOperators #-}
+
+module RIO.Effect
   ( -- $intro
 
     -- * Getting Started
@@ -11,16 +13,23 @@ module Effect
 
     -- ** Effect handlers
   , (:~>)
+  , handleEffect
   , AllOf
 
     -- ** Effectful environments
   , Handles
+  , runEff
   ) where
 
-import Effect.AllOf
-import Effect.EFF
-import Effect.Handler
-import Effect.Handles
+-- rio-effect
+import RIO.Effect.AllOf
+import RIO.Effect.EFF
+import RIO.Effect.Handler
+import RIO.Effect.Handles
+
+-- transformers
+import Control.Monad.Trans.Reader ( ReaderT, runReaderT )
+
 
 {- $intro
 
@@ -128,3 +137,8 @@ will be the @teletypeIO@ handler:
 > main = runReaderT authenticate teletypeIO
 
 -}
+
+
+runEff :: eff cfg :~> c -> ReaderT ( eff cfg :~> c ) m a -> m a
+runEff =
+  flip runReaderT

@@ -7,7 +7,7 @@
 {-# language TypeOperators #-}
 {-# language UndecidableInstances #-}
 
-module Effect.AllOf ( AllOf ) where
+module RIO.Effect.AllOf ( AllOf ) where
 
 -- base
 import GHC.Exts ( Constraint )
