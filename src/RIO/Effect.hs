@@ -1,3 +1,4 @@
+{-# language PolyKinds #-}
 {-# language TypeOperators #-}
 
 module RIO.Effect
