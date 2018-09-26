@@ -13,6 +13,7 @@ module RIO.Effect
 
     -- ** Effect handlers
   , (:~>)
+  , ($$)
   , handleEffect
   , AllOf
 
@@ -24,7 +25,7 @@ module RIO.Effect
 -- rio-effect
 import RIO.Effect.AllOf
 import RIO.Effect.EFF
-import RIO.Effect.Handler
+import RIO.Effect.Handler ( (:~>), ($$), handleEffect )
 import RIO.Effect.Handles
 
 -- transformers
