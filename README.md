@@ -6,6 +6,9 @@ reader-effects or something. I'm open to name suggestions!
 
 ## reader-effects demo
 
+(The unannonated source for this demo is at
+[`examples/Teletype.hs`](./examples/Teletype.hs).)
+
 In this demo, we'll look at building the traditional "teletype" example using
 `rio-effect`. `rio-effect` is a slightly different type of extensible effects
 framework that is less powerful than others - it doesn't support special return
