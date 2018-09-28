@@ -54,10 +54,10 @@ instance ( Monad m, Handles eff r, Config eff r ~ cfg, Requires eff r ( ReaderT 
   {-# INLINE send #-}
 
 
--- instance ( Handles eff r, Config eff r ~ cfg, Requires eff r ( RIO r ) ) => EFF eff cfg ( RIO r ) where
---   send eff =
---     asks findHandler >>= \f -> f $$ eff
---   {-# INLINE send #-}
+instance ( Handles eff r, Config eff r ~ cfg, Requires eff r ( RIO r ) ) => EFF eff cfg ( RIO r ) where
+  send eff =
+    asks ( findHandler @eff ) >>= \f -> f $$ send eff
+  {-# INLINE send #-}
 
 
 handleEffect
