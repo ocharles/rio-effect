@@ -1,5 +1,9 @@
 # `rio-effect`
 
+A note on the name: originally this project was quite tied to RIO, but I've
+since discovered it's more general than that. On release, this will probably be
+reader-effects or something. I'm open to name suggestions!
+
 ## reader-effects demo
 
 In this demo, we'll look at building the traditional "teletype" example using
