@@ -28,8 +28,9 @@ library
     RIO.Effect.EFF
     RIO.Effect.Handles
     RIO.Effect.Handler
+    RIO.Effect.Lift
   build-depends:
-    base ^>= 4.11,
+    base ^>= 4.10 || ^>= 4.11,
     rio,
     transformers ^>= 0.5,
     singleton-bool ^>= 0.1,

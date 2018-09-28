@@ -19,6 +19,7 @@ import GHC.Exts
 import GHC.Generics
 
 -- rio-effect
+import {-# SOURCE #-} RIO.Effect.EFF ( EFF )
 import RIO.Effect.Handler
 
 -- singleton-bool
@@ -30,22 +31,24 @@ class Handles eff a where
 
   type Requires eff a :: ( * -> * ) -> Constraint
 
-  findHandler :: a -> eff ( Config eff a ) :~> Requires eff a
+  findHandler :: a -> EFF eff ( Config eff a ) :~> Requires eff a
 
   type Config eff a = GConfig eff ( Rep a )
 
   type Requires eff a = GRequires eff ( Rep a )
 
-  default findHandler :: ( Generic a, GFindHandler ( Rep a ) eff cfg c, ( Config eff a ) ~ cfg, Requires eff a ~ c ) => a -> eff ( Config eff a ) :~> Requires eff a
+  default findHandler
+    :: ( Generic a, GFindHandler ( Rep a ) eff cfg c, Config eff a ~ cfg, Requires eff a ~ c )
+    => a -> EFF eff ( Config eff a ) :~> Requires eff a
   findHandler =
     gfindHandler . from
 
 
-instance ( f ~ g ) => Handles f ( g cfg :~> c ) where
-  type Config f ( g cfg :~> c ) =
+instance ( f ~ g ) => Handles f ( EFF g cfg :~> c ) where
+  type Config f ( EFF g cfg :~> c ) =
     cfg
 
-  type Requires f ( g cfg :~> c ) =
+  type Requires f ( EFF g cfg :~> c ) =
     c
 
   findHandler =
@@ -54,7 +57,7 @@ instance ( f ~ g ) => Handles f ( g cfg :~> c ) where
 
 
 type family ProductHasEff eff a :: Bool where
-  ProductHasEff eff ( eff _ :~> _, _ ) = 'True
+  ProductHasEff eff ( EFF eff _ :~> _, _ ) = 'True
   ProductHasEff _ _ = 'False
 
 
@@ -83,7 +86,7 @@ instance ( If ( ProductHasEff eff ( a1, ( a2, a3 ) ) ) ( Handles eff a1 ) ( Hand
 
 
 type family HasEff eff ( f :: * -> * ) :: Bool where
-  HasEff eff ( K1 _ ( eff _ :~> _ ) ) = 'True
+  HasEff eff ( K1 _ ( EFF eff _ :~> _ ) ) = 'True
   HasEff eff ( M1 _ _ f ) = HasEff eff f
   HasEff eff ( f :*: g ) = HasEff eff f || HasEff eff g
   HasEff _ _ = 'False
@@ -94,7 +97,7 @@ class GFindHandler f eff cfg c where
 
   type GConfig eff f :: k
 
-  gfindHandler :: f a -> eff cfg :~> c
+  gfindHandler :: f a -> EFF eff cfg :~> c
 
 
 instance GFindHandler f eff cfg c => GFindHandler ( M1 i z f ) eff cfg c where
@@ -120,10 +123,10 @@ instance ( If ( HasEff eff f ) ( GFindHandler f eff cfg c ) ( GFindHandler g eff
   {-# INLINE gfindHandler #-}
 
 
-instance ( eff' ~ eff, cfg' ~ cfg, c' ~ c ) => GFindHandler ( K1 i ( eff' cfg' :~> c' ) ) eff cfg c where
-  type GRequires eff ( K1 i ( eff' cfg' :~> c' ) ) = c'
+instance ( eff' ~ eff, cfg' ~ cfg, c' ~ c ) => GFindHandler ( K1 i ( EFF eff' cfg' :~> c' ) ) eff cfg c where
+  type GRequires eff ( K1 i ( EFF eff' cfg' :~> c' ) ) = c'
 
-  type GConfig eff ( K1 i ( eff' cfg' :~> c' ) ) = cfg'
+  type GConfig eff ( K1 i ( EFF eff' cfg' :~> c' ) ) = cfg'
 
   gfindHandler ( K1 a ) = a
   {-# INLINE gfindHandler #-}

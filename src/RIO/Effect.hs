@@ -1,4 +1,6 @@
 {-# language PolyKinds #-}
+{-# language ScopedTypeVariables #-}
+{-# language TypeApplications #-}
 {-# language TypeOperators #-}
 
 module RIO.Effect
@@ -18,16 +20,23 @@ module RIO.Effect
   , handleEffect
   , AllOf
 
+    -- ** Lifting effects
+  , Lift
+  , relay
+  , liftHandler
+
     -- ** Effectful environments
   , Handles
   , runEff
+  , handleEffects
   ) where
 
 -- rio-effect
 import RIO.Effect.AllOf
 import RIO.Effect.EFF
-import RIO.Effect.Handler ( (:~>), ($$), handleEffect )
+import RIO.Effect.Handler
 import RIO.Effect.Handles
+import RIO.Effect.Lift
 
 -- transformers
 import Control.Monad.Trans.Reader ( ReaderT, runReaderT )
@@ -144,3 +153,12 @@ will be the @teletypeIO@ handler:
 runEff :: eff cfg :~> c -> ReaderT ( eff cfg :~> c ) m a -> m a
 runEff =
   flip runReaderT
+
+
+liftHandler :: forall a. a :~> Lift a
+liftHandler =
+  HandleWith ( \m -> relay @a m )
+
+
+handleEffects =
+  runReaderT

@@ -2,16 +2,19 @@
 {-# language RankNTypes #-}
 {-# language TypeOperators #-}
 
-module RIO.Effect.Handler ( (:~>)(..), handleEffect ) where
+module RIO.Effect.Handler ( (:~>)(..) ) where
+
+import Control.Category
+import Prelude hiding ( (.), id )
 
 
-newtype (:~>) eff constraints =
-  HandleWith { ($$) :: forall m x. constraints m => eff x -> m x }
+newtype c :~> c' =
+  HandleWith { ($$) :: forall x. ( forall m. ( Monad m, c m ) => m x ) -> ( forall n. ( Monad n, c' n ) => n x ) }
 
 
-handleEffect
-  :: forall c eff.
-     ( forall m x. c m => eff x -> m x )
-  -> eff :~> c
-handleEffect =
-  HandleWith
+instance Category (:~>) where
+  id =
+    HandleWith ( \m -> m )
+
+  HandleWith g . HandleWith f =
+    HandleWith ( \m -> g ( f m ) )
