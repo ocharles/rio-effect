@@ -13,6 +13,7 @@ module RIO.Effect
     -- ** Using effects
     EFF
   , send
+  , genericSend
 
     -- ** Effect handlers
   , (:~>)
@@ -34,6 +35,7 @@ module RIO.Effect
 -- rio-effect
 import RIO.Effect.AllOf
 import RIO.Effect.EFF
+import RIO.Effect.GenericSend
 import RIO.Effect.Handler
 import RIO.Effect.Handles
 import RIO.Effect.Lift

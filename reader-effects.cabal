@@ -26,8 +26,9 @@ library
   other-modules:
     RIO.Effect.AllOf
     RIO.Effect.EFF
-    RIO.Effect.Handles
+    RIO.Effect.GenericSend
     RIO.Effect.Handler
+    RIO.Effect.Handles
     RIO.Effect.Lift
   build-depends:
     base ^>= 4.10 || ^>= 4.11,
